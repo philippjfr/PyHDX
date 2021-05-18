@@ -76,6 +76,8 @@ class MappingFileInputControl(ControlPanel):
         except KeyError:
             sio.seek(0)
             protein = csv_to_protein(sio)
+
+        protein.df.index = protein.df.index + self.offset
         return protein
 
     def _add_dataset(self):
