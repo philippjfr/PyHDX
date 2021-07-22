@@ -349,7 +349,8 @@ def run_optimizer(inputs, output_data, optimizer_klass, optimizer_kwargs, model,
 
 
 def regularizer_1d(r1, param):
-    return r1 * torch.mean(torch.abs(param[:-1] - param[1:]))
+    reg_loss = r1 * torch.mean(torch.abs(param[:-1] - param[1:]))
+    return reg_loss,
 
 
 def regularizer_2d_mean(r1, r2, param):
@@ -357,16 +358,18 @@ def regularizer_2d_mean(r1, r2, param):
     #param shape: Ns x Nr x 1
     d_ax1 = torch.abs(param[:, :-1, :] - param[:, 1:, :])
     d_ax2 = torch.abs(param - torch.mean(param, axis=0))
-    reg_loss = r1 * torch.mean(d_ax1) + r2 * torch.mean(d_ax2)
-    return reg_loss
+    reg_loss_1 = r1 * torch.mean(d_ax1)
+    reg_loss_2 = r2 * torch.mean(d_ax2)
+    return reg_loss_1, reg_loss_2
 
 
 def regularizer_2d_reference(r1, r2, param):
     #todo allow regularization wrt reference rather than mean
     d_ax1 = torch.abs(param[:, :-1, :] - param[:, 1:, :])
     d_ax2 = torch.abs(param - param[0])[1:]
-    reg_loss = r1 * torch.mean(d_ax1) + r2 * torch.mean(d_ax2)
-    return reg_loss
+    reg_loss_1 = r1 * torch.mean(d_ax1)
+    reg_loss_2 = r2 * torch.mean(d_ax2)
+    return reg_loss_1, reg_loss_2
 
 
 def regularizer_2d_aligned(r1, r2, indices, param):
@@ -375,8 +378,9 @@ def regularizer_2d_aligned(r1, r2, indices, param):
     d_ax1 = torch.abs(param[:, :-1, :] - param[:, 1:, :])
     d_ax2 = torch.abs(param[0][i0] - param[1][i1])
 
-    reg_loss = r1 * torch.mean(d_ax1) + r2 * torch.mean(d_ax2)
-    return reg_loss
+    reg_loss_1 = r1 * torch.mean(d_ax1)
+    reg_loss_2 = r2 * torch.mean(d_ax2)
+    return reg_loss_1, reg_loss_2
 
 
 def _loss_df(total_loss, mse_loss):
